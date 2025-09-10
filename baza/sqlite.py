@@ -34,6 +34,23 @@ class Database:
         telegram_id NUMBER unique );
               """
         self.execute(sql, commit=True)
+        
+        self.execute("""
+        CREATE TABLE IF NOT EXISTS APPLICATIONS (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            first_name TEXT,
+            last_name TEXT,
+            phone TEXT,
+            email TEXT,
+            address TEXT,
+            education TEXT,
+            political_exp TEXT,
+            motivation TEXT,
+            documents TEXT,
+            telegram_id INTEGER,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """, commit=True)
 
     @staticmethod
     def format_args(sql, parameters: dict):
@@ -74,7 +91,19 @@ class Database:
     def all_users_id(self):
         return self.execute("SELECT telegram_id FROM Users;", fetchall=True)
     
-
+    def add_application(self, first_name, last_name, phone, email, address,
+                        education, political_exp, motivation, documents, telegram_id):
+        try:
+            self.execute("""
+                INSERT INTO APPLICATIONS 
+                (first_name, last_name, phone, email, address, education, 
+                 political_exp, motivation, documents, telegram_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (first_name, last_name, phone, email, address,
+                  education, political_exp, motivation, documents, telegram_id), commit=True)
+        
+        except Exception as err:
+            print(f"Xatolik yuz berdi: {err}")
 
 def logger(statement):
     print(f"""
